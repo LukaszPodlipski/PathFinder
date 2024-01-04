@@ -1,0 +1,29 @@
+body {
+  font-family: 'Roboto', sans-serif;
+  font-size: 18px;
+}
+
+.cell {
+  width: 10px;
+  height: 10px;
+  border: 1px solid #c1c1c1;
+}
+
+.cell--track {
+  background-color: #472600;
+  border: 1px solid #472600;
+}
+
+.cell--start {
+  background-color: #00ff00;
+  border: 1px solid #00ff00;
+}
+
+.cell--finish {
+  background-color: #ff0000;
+  border: 1px solid #ff0000;
+}
+
+.cell--clickable {
+  cursor: pointer;
+}

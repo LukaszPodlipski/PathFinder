@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI</title>
+    <link rel="stylesheet" href="style.css" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/primeflex@3.3.1/primeflex.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="http://fonts.googleapis.com/css?family=Roboto"
+      rel="stylesheet"
+      type="text/css"
+    />
+  </head>
+  <body>
+    <div id="app" class="flex align-items-center justify-content-center p-4">
+      <div class="flex">
+        <div v-for="col in COLS_NUMBER" class="column">
+          <div
+            v-for="row in ROWS_NUMBER"
+            class="cell p-2 flex align-items-center justify-content-center"
+            :class="{'cell--track': cellIsInTrack(row, col), 'cell--start': cellIsStartPoint(row, col), 'cell--finish': cellIsFinishPoint(row,col), 'cell--clickable': cellIsNeighbour(row, col)}"
+            :data-row="row"
+            :data-col="col"
+            @click="handleClick"
+          >
+            <span v-if="cellIsStartPoint(row, col)">S</span>
+            <span v-if="cellIsFinishPoint(row, col)">K</span>
+          </div>
+        </div>
+        <div style="width: 200px" class="flex flex-column gap-4 p-4">
+          <span>Ścieżka ukończona {{isTrackComplete ? "Tak" : "Nie"}}</span>
+          <button @click="resetTrackCells">ZRESETUJ ŚCIEŻKĘ</button>
+          <p>{{trackCells}}</p>
+        </div>
+      </div>
+    </div>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
