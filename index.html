@@ -4,38 +4,149 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AI</title>
+    <link rel="icon" type="image/svg+xml" href="./start.png" />
+    <title>Path Finder</title>
     <link rel="stylesheet" href="style.css" />
     <link
       href="https://cdn.jsdelivr.net/npm/primeflex@3.3.1/primeflex.min.css"
       rel="stylesheet"
     />
     <link
-      href="http://fonts.googleapis.com/css?family=Roboto"
+      href="https://fonts.cdnfonts.com/css/source-code-pro"
       rel="stylesheet"
-      type="text/css"
     />
   </head>
   <body>
-    <div id="app" class="flex align-items-center justify-content-center p-4">
+    <div
+      id="app"
+      class="flex flex-column align-items-center justify-content-center h-full"
+    >
+      <div class="flex align-items-center gap-4">
+        <img class="icon" src="./start.png" alt="" />
+        <h1>Fastest path finder</h1>
+        <img class="icon" src="./start.png" alt="" />
+      </div>
       <div class="flex">
-        <div v-for="col in COLS_NUMBER" class="column">
-          <div
-            v-for="row in ROWS_NUMBER"
-            class="cell p-2 flex align-items-center justify-content-center"
-            :class="{'cell--track': cellIsInTrack(row, col), 'cell--start': cellIsStartPoint(row, col), 'cell--finish': cellIsFinishPoint(row,col), 'cell--clickable': cellIsNeighbour(row, col)}"
-            :data-row="row"
-            :data-col="col"
-            @click="handleClick"
-          >
-            <span v-if="cellIsStartPoint(row, col)">S</span>
-            <span v-if="cellIsFinishPoint(row, col)">K</span>
+        <div class="flex flex-column gap-3">
+          <div class="cells-wrapper">
+            <div v-for="col in COLS_NUMBER" class="column">
+              <div
+                v-for="row in ROWS_NUMBER"
+                class="cell"
+                :class="{'cell--track': cellIsInTrack(row, col), 'cell--start': cellIsStartPoint(row, col), 'cell--finish': cellIsFinishPoint(row,col), 'cell--clickable': cellIsNeighbour(row, col)}"
+                :data-row="row"
+                :data-col="col"
+                @click="handleClick"
+              >
+                <span v-if="cellIsStartPoint(row, col)">
+                  <img class="icon" src="./start.png" alt="" />
+                </span>
+                <span
+                  v-if="cellIsFinishPoint(row, col) && currentCarPosition.row !== row && currentCarPosition.col !== col"
+                >
+                  <img class="icon" src="./finish.png" alt="" />
+                </span>
+                <span
+                  v-if="currentCarPosition.row === row && currentCarPosition.col === col"
+                >
+                  <img class="icon" src="./car.png" alt="" />
+                </span>
+              </div>
+            </div>
+          </div>
+          <div class="tracks-presets">
+            <span>Saved presets</span>
+            <div v-if="routePresets.length" class="flex flex-column gap-2">
+              <div
+                class="preset"
+                v-for="(preset, index) in routePresets"
+                :key="index"
+                @click="loadPreset(preset)"
+              >
+                Track no. {{index + 1}}
+              </div>
+            </div>
+            <span v-else>No presets</span>
           </div>
         </div>
-        <div style="width: 200px" class="flex flex-column gap-4 p-4">
-          <span>Ścieżka ukończona {{isTrackComplete ? "Tak" : "Nie"}}</span>
-          <button @click="resetTrackCells">ZRESETUJ ŚCIEŻKĘ</button>
-          <p>{{trackCells}}</p>
+        <div class="controls-wrapper">
+          <div class="flex flex-column align-items-start w-full gap-2 mb-2">
+            <span class="mode">Mode: {{currentMode}}</span>
+            <span class="active" :class="{'inactive': !isTrackComplete}"
+              >Track: {{!isTrackComplete ? "Not ready" : "Ready"}}</span
+            >
+          </div>
+          <button
+            @click="resetTrackCells"
+            class="button"
+            :class="{'button--disabled': isDrawingRoute || currentMode === 'Finding fastest route'}"
+          >
+            Reset track
+          </button>
+          <button
+            @click="findAndDrawFastestRoute"
+            class="button"
+            :class="{'button--disabled': !isTrackComplete}"
+          >
+            Find fastest route
+          </button>
+          <button
+            @click="savePreset"
+            class="button"
+            :class="{'button--disabled': !isTrackComplete || !trackIsDiffrentThenPresets || isDrawingRoute}"
+          >
+            Save track as preset
+          </button>
+          <div class="debug-section">
+            <span>Heurestic weight:</span>
+            <input
+              class="input"
+              type="number"
+              v-model="heuristicWeight"
+              min="0"
+            />
+            <span>Obstacle weight:</span>
+            <input
+              class="input"
+              type="number"
+              v-model="obstacleWeight"
+              min="0"
+            />
+          </div>
+          <div class="debug-section">
+            <span>Debug:</span>
+            <span
+              >Simulation time: {{timeTaken ? timeTaken + ' s' : '-'}}
+            </span>
+            <span>Time history: {{ timeTakenHistory.length ? '' : '-'}}</span>
+            <div class='times'>
+              <span v-for="(time,index) in timeTakenHistory" :key="index"
+                >{{index + 1}} - {{time}} s</span
+              >
+            </div>
+          </div>
+          <div
+            class="debug-section"
+            v-if="currentMode === 'Finding fastest route'"
+          >
+            <span>Current car position:</span>
+            <span>Row: {{ currentCarPosition.row }}</span>
+            <span>Col: {{ currentCarPosition.col }}</span>
+          </div>
+          <div v-if="fastestRoute.length" class="fastest-track-preview mt-2">
+            <span>Fastest path preview:</span>
+            <div class="cells-wrapper mt-4">
+              <div v-for="col in COLS_NUMBER" class="column">
+                <div
+                  v-for="row in ROWS_NUMBER"
+                  class="cell cell--preview"
+                  :class="{'cell--track': cellIsInFastestRoute(row, col), 'cell--start': cellIsStartPoint(row, col), 'cell--finish': cellIsFinishPoint(row,col)}"
+                  :data-row="row"
+                  :data-col="col"
+                ></div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

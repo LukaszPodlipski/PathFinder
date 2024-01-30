@@ -1,29 +1,156 @@
 body {
-  font-family: 'Roboto', sans-serif;
+  font-family: 'Source Code Pro', sans-serif;
   font-size: 18px;
+  background-color: #e8dcfc;
+  height: 95vh;
+  box-sizing: border-box;
+  color: #5d2ed6;
+  font-weight: 500;
+}
+
+/* CELLS AND TRACKS */
+
+.cells-wrapper {
+  display: flex;
+  border: 2px solid #9f88cc;
+  background-color: #cdbaf2;
+  border-radius: 4px;
 }
 
 .cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
   width: 10px;
   height: 10px;
-  border: 1px solid #c1c1c1;
+  border: 1px solid #9f88cc;
+}
+
+.cell--preview {
+  width: 3px;
+  height: 3px;
+  padding: 2px;
 }
 
 .cell--track {
-  background-color: #472600;
-  border: 1px solid #472600;
+  background-color: #1a034ccc;
+  border: 1px solid #160047aa;
 }
 
 .cell--start {
-  background-color: #00ff00;
-  border: 1px solid #00ff00;
+  background-color: #01c801ac;
+  border: 1px solid #00fb00ac;
+  border: 1px solid #5d2ed6;
 }
 
 .cell--finish {
-  background-color: #ff0000;
+  background-color: #ff000097;
   border: 1px solid #ff0000;
+  border: 1px solid #5d2ed6;
 }
 
 .cell--clickable {
   cursor: pointer;
+}
+
+.cell--clickable:not(.cell--track):hover {
+  background-color: #1a034c67;
+}
+
+.icon {
+  max-width: 28px;
+  max-height: 28px;
+}
+
+/* CONTROLS AND STATUSES */
+
+.controls-wrapper {
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  gap: 16px;
+  align-items: center;
+  background-color: #cdbaf2;
+  margin-left: 12px;
+  border-radius: 4px;
+  border: 3px solid #9f88cc;
+  width: 300px;
+}
+
+.active {
+  color: #00c000fe;
+}
+
+.inactive {
+  color: #ff000097;
+}
+
+.button {
+  font-family: 'Source Code Pro', sans-serif;
+  background-color: #8366bb;
+  border-radius: 4px;
+  padding: 12px 8px;
+  width: 100%;
+  color: #ffffff;
+  cursor: pointer;
+  border: none;
+}
+
+.button--disabled {
+  background-color: #ff000097;
+  cursor: not-allowed;
+}
+
+/* PRESETS */
+
+.tracks-presets {
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  border: 3px solid #9f88cc;
+  background-color: #cdbaf2;
+  border-radius: 4px;
+}
+
+.preset {
+  color: #247724dc;
+  cursor: pointer;
+}
+.preset:hover {
+  color: #24772465;
+}
+
+.mode {
+  color: #5d2ed6;
+}
+
+.debug-section {
+  display: flex;
+  flex-direction: column;
+  width: 90%;
+  gap: 16px;
+  padding: 16px;
+  border-radius: 4px;
+  border: 3px solid #9f88cc;
+  background-color: #bca9e1;
+}
+
+.input {
+  all: unset;
+  height: 32px;
+  background-color: #e8dcfc;
+  border: 1px solid #9f88cc;
+  border-radius: 4px;
+  padding: 4px;
+  -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
+  -moz-box-sizing: border-box; /* Firefox, other Gecko */
+  box-sizing: border-box; /* Opera/IE 8+ */
+}
+
+.times {
+  display: flex;
+  flex-direction: column;
+  max-height: 100px;
+  overflow-y: scroll;
 }
