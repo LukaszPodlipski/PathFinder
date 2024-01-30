@@ -120,8 +120,8 @@
             </span>
             <span>Time history: {{ timeTakenHistory.length ? '' : '-'}}</span>
             <div class='times'>
-              <span v-for="(time,index) in timeTakenHistory" :key="index"
-                >{{index + 1}} - {{time}} s</span
+              <span v-for="(record,index) in timeTakenHistory" :key="index"
+                >{{index + 1}}. {{record.time}} s - ({{record.length}}) length</span
               >
             </div>
           </div>

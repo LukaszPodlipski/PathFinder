@@ -230,7 +230,10 @@ const app = createApp({
       const endTime = performance.now();
       const timeTaken =
         Math.round(((endTime - startTime) / 1000) * 1000) / 1000;
-      this.timeTakenHistory.push(timeTaken);
+      this.timeTakenHistory.push({
+        time: timeTaken,
+        length: this.fastestRoute.length,
+      });
       this.timeTaken = timeTaken;
 
       this.isDrawingRoute = true;
