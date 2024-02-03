@@ -51,7 +51,7 @@ const app = createApp({
       );
     },
     /* ----------------------- CHECK IF TRACK SHOULD BE SAVEABLE ---------------------- */
-    trackIsDiffrentThenPresets() {
+    trackIsDiffrentThanPresets() {
       return this.routePresets.every((preset) => {
         return (
           JSON.stringify(preset.trackCells) !== JSON.stringify(this.trackCells)
@@ -258,20 +258,21 @@ const app = createApp({
         await sleep(5);
       }
     },
+    // A* algorithm implementation
     async aStar(grid, start, end) {
-      const openSet = [start];
-      const cameFrom = {};
-      const gScore = { [start.row + '-' + start.col]: 0 };
+      const openSet = [start]; // The set of nodes to be evaluated
+      const cameFrom = {}; // the map of parents of nodes
+      const gScore = { [start.row + '-' + start.col]: 0 }; // the map of costs from start to a node
       const fScore = {
         [start.row + '-' + start.col]:
           this.heuristicWeight * heuristic(start, end),
-      };
+      }; // the map of costs from start to a node + heuristic cost to the end
 
       while (openSet.length > 0) {
         openSet.sort(
           (a, b) => fScore[a.row + '-' + a.col] - fScore[b.row + '-' + b.col]
         );
-        const current = openSet.shift();
+        const current = openSet.shift(); // the node in openSet having the lowest fScore[] value (cost)
         await sleep(10);
 
         this.currentCarPosition = { ...current };
@@ -279,9 +280,10 @@ const app = createApp({
         if (current.row === end.row && current.col === end.col) {
           const path = reconstructPath(cameFrom, end);
           return path;
-        }
+        } // if current is the end node, return the path
 
         for (const neighbor of getNeighbors(grid, current)) {
+          // getNeighbors(grid, current) - returns the list of neighbors of the current node
           const tentativeGScore = gScore[current.row + '-' + current.col] + 1;
 
           if (
@@ -318,6 +320,9 @@ function sleep(ms) {
 
 /* --------------------------- CHECKING INSEPARABILITY OF TRACK ------------------------ */
 // Depth-First Search (DFS) algorithm
+// row, col - current point coordinates
+// targetRow, targetCol - finish point coordinates
+// matrix - representing the grid
 function dfs(row, col, targetRow, targetCol, matrix) {
   if (
     row < 0 ||
@@ -367,7 +372,7 @@ function checkInseparability(startPointCoords, finishPointCoords, trackCells) {
     matrix[cell.row][cell.col] = 1;
   }
 
-  // Check inseparability
+  // Check inseparability with DFS algorithm
   return dfs(
     startPointCoords.row,
     startPointCoords.col,
@@ -381,7 +386,7 @@ function checkInseparability(startPointCoords, finishPointCoords, trackCells) {
 
 function heuristic(a, b) {
   return Math.abs(a.row - b.row) + Math.abs(a.col - b.col);
-}
+} // calcualtes the cost of moving from point a to point b
 
 function getNeighbors(grid, { row, col }) {
   const neighbors = [];
