@@ -16,6 +16,7 @@ const app = createApp({
       heuristicWeight: 1,
       timeTaken: 0,
       timeTakenHistory: [],
+      openSet: [],
     };
   },
   computed: {
@@ -261,7 +262,7 @@ const app = createApp({
     // A* algorithm implementation
     async aStar(grid, start, end) {
       const openSet = [start]; // The set of nodes to be evaluated
-      const cameFrom = {}; // the map of parents of nodes
+      const cameFrom = {}; // the map of parents of nodes - ordered list of nodes from start to end with info of the parent of each node
       const gScore = { [start.row + '-' + start.col]: 0 }; // the map of costs from start to a node
       const fScore = {
         [start.row + '-' + start.col]:
@@ -272,6 +273,7 @@ const app = createApp({
         openSet.sort(
           (a, b) => fScore[a.row + '-' + a.col] - fScore[b.row + '-' + b.col]
         );
+        this.openSet = openSet;
         const current = openSet.shift(); // the node in openSet having the lowest fScore[] value (cost)
         await sleep(10);
 
@@ -280,27 +282,29 @@ const app = createApp({
         if (current.row === end.row && current.col === end.col) {
           const path = reconstructPath(cameFrom, end);
           return path;
-        } // if current is the end node, return the path
+        } // success condition - if current is the end node, return the final path
 
         for (const neighbor of getNeighbors(grid, current)) {
-          // getNeighbors(grid, current) - returns the list of neighbors of the current node
+          // getNeighbors(grid, current) - returns the list of neighbors of the current node - only the nodes that are track cells
           const tentativeGScore = gScore[current.row + '-' + current.col] + 1;
+          // tentativeGScore - the cost of moving from start to a neighbor
 
           if (
             !gScore.hasOwnProperty(neighbor.row + '-' + neighbor.col) ||
             tentativeGScore < gScore[neighbor.row + '-' + neighbor.col]
           ) {
-            cameFrom[neighbor.row + '-' + neighbor.col] = current;
-            gScore[neighbor.row + '-' + neighbor.col] = tentativeGScore;
-            fScore[neighbor.row + '-' + neighbor.col] =
+            // if the neighbor is not in gScore or the cost of moving from start to a neighbor is less than the cost in gScore
+            cameFrom[neighbor.row + '-' + neighbor.col] = current; // set the parent of the neighbor to the current node
+            gScore[neighbor.row + '-' + neighbor.col] = tentativeGScore; // set the cost of moving from start to a neighbor
+            fScore[neighbor.row + '-' + neighbor.col] = // set the cost of moving from start to a neighbor + heuristic cost to the end
               tentativeGScore + this.heuristicWeight * heuristic(neighbor, end);
 
             if (
               !openSet.some(
                 (node) => node.row === neighbor.row && node.col === neighbor.col
-              )
+              ) // if the neighbor is not in openSet
             ) {
-              openSet.push(neighbor);
+              openSet.push(neighbor); // add the neighbor to openSet
             }
           }
         }
@@ -408,8 +412,9 @@ function getNeighbors(grid, { row, col }) {
   }
 
   return neighbors;
-}
+} // returns the list of neighbors of the current node - only the nodes that are track cells
 
+// cameFrom - the map of parents of nodes - ordered list of nodes from start to end with info of the parent of each node
 function reconstructPath(cameFrom, current) {
   const path = [current];
 

@@ -33,7 +33,7 @@
               <div
                 v-for="row in ROWS_NUMBER"
                 class="cell"
-                :class="{'cell--track': cellIsInTrack(row, col), 'cell--start': cellIsStartPoint(row, col), 'cell--finish': cellIsFinishPoint(row,col), 'cell--clickable': cellIsNeighbour(row, col)}"
+                :class="{'cell--track': cellIsInTrack(row, col), 'cell--start': cellIsStartPoint(row, col), 'cell--finish': cellIsFinishPoint(row,col), 'cell--clickable': cellIsNeighbour(row, col), 'cell-openset': openSet.some(cell => cell.row === row && cell.col === col) && currentMode === 'Finding fastest route'}"
                 :data-row="row"
                 :data-col="col"
                 @click="handleClick"

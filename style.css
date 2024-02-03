@@ -58,6 +58,10 @@ body {
   background-color: #1a034c67;
 }
 
+.cell-openset {
+  background-color: #00ff40;
+}
+
 .icon {
   max-width: 28px;
   max-height: 28px;
