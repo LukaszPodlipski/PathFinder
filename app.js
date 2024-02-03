@@ -14,7 +14,6 @@ const app = createApp({
       currentMode: 'Set start point',
       routePresets: [],
       heuristicWeight: 1,
-      obstacleWeight: 1,
       timeTaken: 0,
       timeTakenHistory: [],
     };
@@ -153,7 +152,12 @@ const app = createApp({
       this.timeTaken = 0;
     },
     savePreset() {
-      if (!this.isTrackComplete) return;
+      if (
+        !this.isTrackComplete ||
+        this.isDrawingRoute ||
+        this.currentMode === 'Finding fastest route'
+      )
+        return;
       this.routePresets.push({
         startPointCoords: { ...this.startPointCoords },
         finishPointCoords: { ...this.finishPointCoords },
@@ -161,7 +165,8 @@ const app = createApp({
       });
     },
     loadPreset(preset) {
-      if (this.isDrawingRoute) return;
+      if (this.isDrawingRoute || this.currentMode === 'Finding fastest route')
+        return;
 
       this.resetTrackCells();
       this.startPointCoords = { ...preset.startPointCoords };
@@ -250,7 +255,7 @@ const app = createApp({
       for (let i = 0; i < route.length; i++) {
         const { row, col } = route[i];
         this.currentCarPosition = { row, col };
-        await sleep(10);
+        await sleep(5);
       }
     },
     async aStar(grid, start, end) {
@@ -267,7 +272,7 @@ const app = createApp({
           (a, b) => fScore[a.row + '-' + a.col] - fScore[b.row + '-' + b.col]
         );
         const current = openSet.shift();
-        await sleep(50);
+        await sleep(10);
 
         this.currentCarPosition = { ...current };
 
@@ -277,8 +282,7 @@ const app = createApp({
         }
 
         for (const neighbor of getNeighbors(grid, current)) {
-          const tentativeGScore =
-            gScore[current.row + '-' + current.col] + this.obstacleWeight;
+          const tentativeGScore = gScore[current.row + '-' + current.col] + 1;
 
           if (
             !gScore.hasOwnProperty(neighbor.row + '-' + neighbor.col) ||

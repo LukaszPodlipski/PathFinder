@@ -98,18 +98,15 @@
             Save track as preset
           </button>
           <div class="debug-section">
-            <span>Heurestic weight:</span>
+            <span
+              data-tooltip="Higher values will make the algorithm faster and less optimal. Lower values will make the algorithm more optimal but much slower."
+              >Heurestic weight:</span
+            >
             <input
               class="input"
               type="number"
+              :disabled='isDrawingRoute || currentMode === "Finding fastest route"'
               v-model="heuristicWeight"
-              min="0"
-            />
-            <span>Obstacle weight:</span>
-            <input
-              class="input"
-              type="number"
-              v-model="obstacleWeight"
               min="0"
             />
           </div>
@@ -119,9 +116,10 @@
               >Simulation time: {{timeTaken ? timeTaken + ' s' : '-'}}
             </span>
             <span>Time history: {{ timeTakenHistory.length ? '' : '-'}}</span>
-            <div class='times'>
+            <div class="times">
               <span v-for="(record,index) in timeTakenHistory" :key="index"
-                >{{index + 1}}. {{record.time}} s - ({{record.length}}) length</span
+                >{{index + 1}}. {{record.time}} s - ({{record.length}})
+                length</span
               >
             </div>
           </div>
